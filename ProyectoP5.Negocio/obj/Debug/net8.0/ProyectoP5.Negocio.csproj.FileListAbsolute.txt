@@ -1,0 +1,11 @@
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\bin\Debug\net8.0\ProyectoP5.Negocio.deps.json
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\bin\Debug\net8.0\ProyectoP5.Negocio.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\bin\Debug\net8.0\ProyectoP5.Negocio.pdb
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\ProyectoP5.Negocio.GeneratedMSBuildEditorConfig.editorconfig
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\ProyectoP5.Negocio.AssemblyInfoInputs.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\ProyectoP5.Negocio.AssemblyInfo.cs
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\ProyectoP5.Negocio.csproj.CoreCompileInputs.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\ProyectoP5.Negocio.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\refint\ProyectoP5.Negocio.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\ProyectoP5.Negocio.pdb
+C:\VSSolutions\ProyectoP5\ProyectoP5.Negocio\obj\Debug\net8.0\ref\ProyectoP5.Negocio.dll

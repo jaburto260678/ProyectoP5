@@ -1,0 +1,11 @@
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\bin\Debug\net8.0\ProyectoP5.Pruebas.deps.json
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\bin\Debug\net8.0\ProyectoP5.Pruebas.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\bin\Debug\net8.0\ProyectoP5.Pruebas.pdb
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\ProyectoP5.Pruebas.GeneratedMSBuildEditorConfig.editorconfig
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\ProyectoP5.Pruebas.AssemblyInfoInputs.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\ProyectoP5.Pruebas.AssemblyInfo.cs
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\ProyectoP5.Pruebas.csproj.CoreCompileInputs.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\ProyectoP5.Pruebas.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\refint\ProyectoP5.Pruebas.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\ProyectoP5.Pruebas.pdb
+C:\VSSolutions\ProyectoP5\ProyectoP5.Pruebas\obj\Debug\net8.0\ref\ProyectoP5.Pruebas.dll

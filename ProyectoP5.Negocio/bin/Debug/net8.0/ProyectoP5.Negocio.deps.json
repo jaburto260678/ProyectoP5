@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "ProyectoP5.Negocio/1.0.0": {
+        "runtime": {
+          "ProyectoP5.Negocio.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ProyectoP5.Negocio/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

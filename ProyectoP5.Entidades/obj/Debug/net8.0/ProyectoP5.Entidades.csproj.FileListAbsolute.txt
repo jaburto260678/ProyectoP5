@@ -1,0 +1,4 @@
+C:\VSSolutions\ProyectoP5\ProyectoP5.Entidades\obj\Debug\net8.0\ProyectoP5.Entidades.GeneratedMSBuildEditorConfig.editorconfig
+C:\VSSolutions\ProyectoP5\ProyectoP5.Entidades\obj\Debug\net8.0\ProyectoP5.Entidades.AssemblyInfoInputs.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Entidades\obj\Debug\net8.0\ProyectoP5.Entidades.AssemblyInfo.cs
+C:\VSSolutions\ProyectoP5\ProyectoP5.Entidades\obj\Debug\net8.0\ProyectoP5.Entidades.csproj.CoreCompileInputs.cache

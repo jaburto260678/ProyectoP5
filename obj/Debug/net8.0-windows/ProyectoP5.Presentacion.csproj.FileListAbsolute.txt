@@ -1,0 +1,7 @@
+C:\VSSolutions\ProyectoP5\obj\Debug\net8.0-windows\ProyectoP5.Presentacion.csproj.AssemblyReference.cache
+C:\VSSolutions\ProyectoP5\obj\Debug\net8.0-windows\ProyectoP5.Form1.resources
+C:\VSSolutions\ProyectoP5\obj\Debug\net8.0-windows\ProyectoP5.Presentacion.csproj.GenerateResource.cache
+C:\VSSolutions\ProyectoP5\obj\Debug\net8.0-windows\ProyectoP5.Presentacion.GeneratedMSBuildEditorConfig.editorconfig
+C:\VSSolutions\ProyectoP5\obj\Debug\net8.0-windows\ProyectoP5.Presentacion.AssemblyInfoInputs.cache
+C:\VSSolutions\ProyectoP5\obj\Debug\net8.0-windows\ProyectoP5.Presentacion.AssemblyInfo.cs
+C:\VSSolutions\ProyectoP5\obj\Debug\net8.0-windows\ProyectoP5.Presentacion.csproj.CoreCompileInputs.cache

@@ -1,0 +1,12 @@
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\bin\Debug\net8.0\ProyectoP5.Datos.deps.json
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\bin\Debug\net8.0\ProyectoP5.Datos.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\bin\Debug\net8.0\ProyectoP5.Datos.pdb
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ProyectoP5.Datos.csproj.AssemblyReference.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ProyectoP5.Datos.GeneratedMSBuildEditorConfig.editorconfig
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ProyectoP5.Datos.AssemblyInfoInputs.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ProyectoP5.Datos.AssemblyInfo.cs
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ProyectoP5.Datos.csproj.CoreCompileInputs.cache
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ProyectoP5.Datos.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\refint\ProyectoP5.Datos.dll
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ProyectoP5.Datos.pdb
+C:\VSSolutions\ProyectoP5\ProyectoP5.Datos\obj\Debug\net8.0\ref\ProyectoP5.Datos.dll
