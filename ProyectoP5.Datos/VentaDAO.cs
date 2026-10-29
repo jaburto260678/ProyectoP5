@@ -46,7 +46,7 @@ namespace ProyectoP5.Datos
                         "Los productos y cantidades deben ser válidos.");
             }
 
-            using var conexion = ConexionBD.CrearConexion();
+            using var conexion = VentaConexion.CrearConexion();
             conexion.Open();
 
             using var transaccion = conexion.BeginTransaction();
