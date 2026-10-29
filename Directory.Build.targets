@@ -1,0 +1,11 @@
+
+<Project>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'ProyectoP5.Presentacion'">
+
+    <Compile Remove="ProyectoP5.Datos\**\*.cs" />
+    <Compile Remove="ProyectoP5.Entidades\**\*.cs" />
+    <Compile Remove="ProyectoP5.Negocio\**\*.cs" />
+    <Compile Remove="ProyectoP5.Pruebas\**\*.cs" />
+
+  </ItemGroup>
+</Project>
