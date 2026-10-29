@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProyectoP5.Entidades
 {
-    class Reportes : Ventas
+    class Reportes
     {
         //Valores
 
