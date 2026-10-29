@@ -8,19 +8,41 @@ using ProyectoP5.Entidades;
 namespace ProyectoP5.Negocio
 {
     /// <summary>
-    /// Contiene las reglas de negocio del módulo de Ventas.
+    /// Contiene las validaciones y operaciones
+    /// principales del módulo de Ventas.
     /// </summary>
     public class VentaServicio
     {
         private readonly VentaDAO ventaDAO;
 
+        /// <summary>
+        /// Inicializa el servicio de ventas.
+        /// </summary>
         public VentaServicio()
         {
             ventaDAO = new VentaDAO();
         }
 
         /// <summary>
-        /// Calcula el total de una lista de productos.
+        /// Obtiene los clientes activos para
+        /// mostrarlos en el formulario.
+        /// </summary>
+        public List<VentaClienteOpcion> ObtenerClientes()
+        {
+            return ventaDAO.ObtenerClientes();
+        }
+
+        /// <summary>
+        /// Obtiene los productos disponibles
+        /// desde la base de datos.
+        /// </summary>
+        public List<VentaProductoOpcion> ObtenerProductos()
+        {
+            return ventaDAO.ObtenerProductos();
+        }
+
+        /// <summary>
+        /// Calcula el total de los productos.
         /// </summary>
         public decimal CalcularTotal(
             List<DetalleVenta> detalles)
@@ -37,7 +59,8 @@ namespace ProyectoP5.Negocio
         }
 
         /// <summary>
-        /// Verifica que la venta tenga datos válidos.
+        /// Comprueba que una venta tenga
+        /// la información necesaria.
         /// </summary>
         public void ValidarVenta(VentaRegistro venta)
         {
@@ -64,7 +87,8 @@ namespace ProyectoP5.Negocio
         }
 
         /// <summary>
-        /// Valida los productos y las cantidades ingresadas.
+        /// Revisa los productos y cantidades
+        /// antes de registrar la venta.
         /// </summary>
         private void ValidarDetalles(
             List<DetalleVenta> detalles)
@@ -98,14 +122,14 @@ namespace ProyectoP5.Negocio
         }
 
         /// <summary>
-        /// Valida y registra una venta en la base de datos.
+        /// Valida y registra una venta en MySQL.
         /// </summary>
         public int RegistrarVenta(VentaRegistro venta)
         {
             ValidarVenta(venta);
 
-            // El DAO consulta los precios reales en MySQL
-            // y verifica el stock antes de guardar.
+            // El DAO comprueba los precios reales,
+            // las existencias y registra los datos.
             return ventaDAO.RegistrarVenta(venta);
         }
     }
