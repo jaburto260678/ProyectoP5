@@ -8,24 +8,19 @@ using ProyectoP5.Entidades;
 namespace ProyectoP5.Negocio
 {
     /// <summary>
-    /// Contiene las validaciones y operaciones
-    /// principales del módulo de Ventas.
+    /// Contiene las reglas de negocio del módulo de Ventas.
     /// </summary>
     public class VentaServicio
     {
         private readonly VentaDAO ventaDAO;
 
-        /// <summary>
-        /// Inicializa el servicio de ventas.
-        /// </summary>
         public VentaServicio()
         {
             ventaDAO = new VentaDAO();
         }
 
         /// <summary>
-        /// Obtiene los clientes activos para
-        /// mostrarlos en el formulario.
+        /// Consulta los clientes activos registrados.
         /// </summary>
         public List<VentaClienteOpcion> ObtenerClientes()
         {
@@ -33,8 +28,7 @@ namespace ProyectoP5.Negocio
         }
 
         /// <summary>
-        /// Obtiene los productos disponibles
-        /// desde la base de datos.
+        /// Consulta los productos disponibles para vender.
         /// </summary>
         public List<VentaProductoOpcion> ObtenerProductos()
         {
@@ -42,25 +36,18 @@ namespace ProyectoP5.Negocio
         }
 
         /// <summary>
-        /// Calcula el total de los productos.
+        /// Calcula el importe total de los productos.
         /// </summary>
         public decimal CalcularTotal(
             List<DetalleVenta> detalles)
         {
-            if (detalles == null)
-            {
-                throw new ArgumentException(
-                    "La lista de productos no puede ser nula.");
-            }
-
             ValidarDetalles(detalles);
 
             return detalles.Sum(d => d.Subtotal);
         }
 
         /// <summary>
-        /// Comprueba que una venta tenga
-        /// la información necesaria.
+        /// Comprueba que la venta tenga información válida.
         /// </summary>
         public void ValidarVenta(VentaRegistro venta)
         {
@@ -87,12 +74,18 @@ namespace ProyectoP5.Negocio
         }
 
         /// <summary>
-        /// Revisa los productos y cantidades
-        /// antes de registrar la venta.
+        /// Comprueba los productos, cantidades y precios.
         /// </summary>
         private void ValidarDetalles(
             List<DetalleVenta> detalles)
         {
+            if (detalles == null ||
+                detalles.Count == 0)
+            {
+                throw new ArgumentException(
+                    "La venta no contiene productos.");
+            }
+
             foreach (DetalleVenta detalle in detalles)
             {
                 if (detalle == null)
@@ -118,18 +111,83 @@ namespace ProyectoP5.Negocio
                     throw new ArgumentException(
                         "El precio no puede ser negativo.");
                 }
+
+                try
+                {
+                    // Comprobar que no haya desbordamiento
+                    // en el cálculo del subtotal.
+                    decimal subtotal = checked(
+                        detalle.Cantidad * detalle.PrecioUnitario);
+
+                    if (subtotal < 0)
+                    {
+                        throw new ArgumentException(
+                            "El subtotal no puede ser negativo.");
+                    }
+                }
+                catch (OverflowException)
+                {
+                    throw new ArgumentException(
+                        "El importe del producto supera " +
+                        "el máximo permitido.");
+                }
+            }
+
+            // Comprobar que el total pueda calcularse.
+            try
+            {
+                decimal total = 0;
+
+                foreach (DetalleVenta detalle in detalles)
+                {
+                    total = checked(
+                        total +
+                        detalle.Cantidad *
+                        detalle.PrecioUnitario);
+                }
+            }
+            catch (OverflowException)
+            {
+                throw new ArgumentException(
+                    "El importe total supera " +
+                    "el máximo permitido.");
+            }
+
+            // Evitar cantidades acumuladas demasiado grandes.
+            var grupos = detalles.GroupBy(
+                detalle => detalle.ProductoId);
+
+            foreach (var grupo in grupos)
+            {
+                long cantidadTotal = grupo.Sum(
+                    detalle => (long)detalle.Cantidad);
+
+                if (cantidadTotal > int.MaxValue)
+                {
+                    throw new ArgumentException(
+                        "La cantidad total de un producto " +
+                        "supera el máximo permitido.");
+                }
+
+                if (grupo.Select(
+                    d => d.PrecioUnitario).Distinct().Count() > 1)
+                {
+                    throw new ArgumentException(
+                        "Un producto tiene precios diferentes " +
+                        "en la misma venta.");
+                }
             }
         }
 
         /// <summary>
-        /// Valida y registra una venta en MySQL.
+        /// Valida los datos y registra la venta en MySQL.
         /// </summary>
         public int RegistrarVenta(VentaRegistro venta)
         {
             ValidarVenta(venta);
 
-            // El DAO comprueba los precios reales,
-            // las existencias y registra los datos.
+            // El DAO revisa el cliente, stock y precio real.
+            // También controla la transacción completa.
             return ventaDAO.RegistrarVenta(venta);
         }
     }

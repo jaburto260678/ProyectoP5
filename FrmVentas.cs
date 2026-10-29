@@ -10,21 +10,26 @@ using ProyectoP5.Negocio;
 namespace ProyectoP5
 {
     /// <summary>
-    /// Formulario para registrar ventas de productos.
+    /// Formulario principal del módulo de Ventas.
+    /// Permite seleccionar clientes, agregar productos
+    /// y registrar ventas en MySQL.
     /// </summary>
     public partial class FrmVentas : Form
     {
         private readonly VentaServicio servicio;
         private readonly List<DetalleVenta> carrito;
 
+        private bool registrandoVenta = false;
+
         private ComboBox cboClientes = null!;
         private ComboBox cboProductos = null!;
         private NumericUpDown nudCantidad = null!;
         private DataGridView dgvDetalles = null!;
 
-        private Label lblStock = null!;
         private Label lblPrecio = null!;
+        private Label lblStock = null!;
         private Label lblTotal = null!;
+        private Label lblEstado = null!;
 
         private Button btnAgregar = null!;
         private Button btnEliminar = null!;
@@ -45,7 +50,7 @@ namespace ProyectoP5
         }
 
         /// <summary>
-        /// Construye los controles de la pantalla.
+        /// Crea los controles de la interfaz gráfica.
         /// </summary>
         private void CrearInterfaz()
         {
@@ -53,8 +58,8 @@ namespace ProyectoP5
 
             StartPosition = FormStartPosition.CenterScreen;
 
-            ClientSize = new Size(1000, 720);
-            MinimumSize = new Size(900, 700);
+            ClientSize = new Size(1000, 735);
+            MinimumSize = new Size(1000, 770);
 
             BackColor = Color.FromArgb(245, 247, 250);
             Font = new Font("Segoe UI", 10);
@@ -70,18 +75,18 @@ namespace ProyectoP5
                 ForeColor = Color.FromArgb(35, 55, 85)
             };
 
-            // Fecha de la operación.
+            // Fecha actual.
             Label lblFecha = new Label
             {
                 Text = "Fecha: " +
                        DateTime.Now.ToString("dd/MM/yyyy"),
-                Location = new Point(760, 35),
-                Size = new Size(210, 30),
+                Location = new Point(745, 35),
+                Size = new Size(220, 30),
                 TextAlign = ContentAlignment.MiddleRight,
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
 
-            // Selección de cliente.
+            // Cliente.
             Label lblCliente = new Label
             {
                 Text = "Cliente:",
@@ -96,21 +101,22 @@ namespace ProyectoP5
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
 
-            // Recargar información.
+            // Actualizar información.
             btnActualizar = new Button
             {
-                Text = "Actualizar datos",
-                Location = new Point(770, 120),
-                Size = new Size(190, 40),
+                Text = "Actualizar productos",
+                Location = new Point(750, 120),
+                Size = new Size(215, 42),
                 BackColor = Color.FromArgb(70, 85, 105),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
 
-            btnActualizar.Click += (s, e) => CargarDatos();
+            btnActualizar.Click +=
+                (s, e) => ActualizarDatosManual();
 
-            // Selección de producto.
+            // Producto.
             Label lblProducto = new Label
             {
                 Text = "Producto:",
@@ -145,39 +151,40 @@ namespace ProyectoP5
                 Value = 1
             };
 
-            // Botón agregar.
+            // Agregar al carrito.
             btnAgregar = new Button
             {
                 Text = "Agregar producto",
                 Location = new Point(745, 220),
-                Size = new Size(215, 40),
+                Size = new Size(220, 42),
                 BackColor = Color.FromArgb(30, 110, 205),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
 
-            btnAgregar.Click += (s, e) => AgregarProducto();
+            btnAgregar.Click +=
+                (s, e) => AgregarProducto();
 
-            // Precio del producto seleccionado.
+            // Precio.
             lblPrecio = new Label
             {
                 Text = "Precio: ₡0.00",
                 Location = new Point(30, 275),
-                Size = new Size(250, 30),
-                ForeColor = Color.FromArgb(50, 70, 90)
-            };
-
-            // Stock disponible.
-            lblStock = new Label
-            {
-                Text = "Stock disponible: 0",
-                Location = new Point(310, 275),
                 Size = new Size(260, 30),
                 ForeColor = Color.FromArgb(50, 70, 90)
             };
 
-            // Título de la tabla.
+            // Inventario.
+            lblStock = new Label
+            {
+                Text = "Stock disponible: 0",
+                Location = new Point(310, 275),
+                Size = new Size(300, 30),
+                ForeColor = Color.FromArgb(50, 70, 90)
+            };
+
+            // Título del carrito.
             Label lblDetalle = new Label
             {
                 Text = "PRODUCTOS DE LA VENTA",
@@ -187,11 +194,11 @@ namespace ProyectoP5
                     "Segoe UI", 12, FontStyle.Bold)
             };
 
-            // Tabla del carrito.
+            // Tabla de artículos.
             dgvDetalles = new DataGridView
             {
                 Location = new Point(30, 365),
-                Size = new Size(930, 205),
+                Size = new Size(935, 205),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
@@ -209,7 +216,7 @@ namespace ProyectoP5
                          AnchorStyles.Right
             };
 
-            // Eliminar producto.
+            // Quitar un producto.
             btnEliminar = new Button
             {
                 Text = "Quitar seleccionado",
@@ -220,9 +227,10 @@ namespace ProyectoP5
                 FlatStyle = FlatStyle.Flat
             };
 
-            btnEliminar.Click += (s, e) => QuitarProducto();
+            btnEliminar.Click +=
+                (s, e) => QuitarProducto();
 
-            // Limpiar venta.
+            // Limpiar el carrito.
             btnLimpiar = new Button
             {
                 Text = "Limpiar venta",
@@ -233,14 +241,15 @@ namespace ProyectoP5
                 FlatStyle = FlatStyle.Flat
             };
 
-            btnLimpiar.Click += (s, e) => LimpiarVenta();
+            btnLimpiar.Click +=
+                (s, e) => LimpiarVenta();
 
             // Total.
             lblTotal = new Label
             {
                 Text = "TOTAL: ₡0.00",
-                Location = new Point(605, 590),
-                Size = new Size(355, 45),
+                Location = new Point(600, 590),
+                Size = new Size(365, 45),
                 Font = new Font(
                     "Segoe UI", 17, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleRight,
@@ -248,12 +257,21 @@ namespace ProyectoP5
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
 
-            // Guardar venta.
+            // Estado del formulario.
+            lblEstado = new Label
+            {
+                Text = "Listo para registrar ventas.",
+                Location = new Point(30, 660),
+                Size = new Size(500, 30),
+                ForeColor = Color.DimGray
+            };
+
+            // Guardar la venta.
             btnRegistrar = new Button
             {
                 Text = "REGISTRAR VENTA",
                 Location = new Point(700, 650),
-                Size = new Size(260, 45),
+                Size = new Size(265, 45),
                 BackColor = Color.FromArgb(30, 135, 75),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
@@ -262,9 +280,9 @@ namespace ProyectoP5
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
 
-            btnRegistrar.Click += (s, e) => RegistrarVenta();
+            btnRegistrar.Click +=
+                (s, e) => RegistrarVenta();
 
-            // Agregar los controles al formulario.
             Controls.AddRange(new Control[]
             {
                 lblTitulo,
@@ -284,6 +302,7 @@ namespace ProyectoP5
                 btnEliminar,
                 btnLimpiar,
                 lblTotal,
+                lblEstado,
                 btnRegistrar
             });
 
@@ -293,18 +312,20 @@ namespace ProyectoP5
         /// <summary>
         /// Carga clientes y productos desde MySQL.
         /// </summary>
-        private void CargarDatos()
+        private bool CargarDatos()
         {
             try
             {
                 int clienteAnterior =
                     (cboClientes.SelectedItem
-                     as VentaClienteOpcion)?.Id ?? 0;
+                    as VentaClienteOpcion)?.Id ?? 0;
 
                 int productoAnterior =
                     (cboProductos.SelectedItem
-                     as VentaProductoOpcion)?.Id ?? 0;
+                    as VentaProductoOpcion)?.Id ?? 0;
 
+                // Consultar primero. Si falla MySQL,
+                // conservamos las opciones anteriores.
                 var clientes = servicio.ObtenerClientes();
                 var productos = servicio.ObtenerProductos();
 
@@ -318,29 +339,73 @@ namespace ProyectoP5
                     c => c.Id == clienteAnterior);
 
                 if (cliente != null)
+                {
                     cboClientes.SelectedItem = cliente;
+                }
 
                 var producto = productos.FirstOrDefault(
                     p => p.Id == productoAnterior);
 
                 if (producto != null)
+                {
                     cboProductos.SelectedItem = producto;
+                }
 
                 ActualizarInformacionProducto();
+
+                lblEstado.Text =
+                    "Información actualizada correctamente.";
+
+                return true;
             }
             catch (Exception ex)
             {
+                lblEstado.Text =
+                    "No se pudo actualizar la información.";
+
                 MessageBox.Show(
-                    "No se pudieron cargar los datos:\n" +
+                    "Error al consultar MySQL:\n" +
                     ex.Message,
                     "Error de conexión",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+
+                return false;
             }
         }
 
         /// <summary>
-        /// Actualiza precio y existencias mostradas.
+        /// Solicita confirmación antes de actualizar
+        /// si hay productos en el carrito.
+        /// </summary>
+        private void ActualizarDatosManual()
+        {
+            if (registrandoVenta)
+                return;
+
+            if (carrito.Count > 0)
+            {
+                var respuesta = MessageBox.Show(
+                    "Al actualizar los productos se limpiará " +
+                    "la venta que está preparando.\n" +
+                    "¿Desea continuar?",
+                    "Confirmar actualización",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (respuesta != DialogResult.Yes)
+                    return;
+            }
+
+            if (CargarDatos())
+            {
+                carrito.Clear();
+                ActualizarTabla();
+            }
+        }
+
+        /// <summary>
+        /// Muestra precio y stock disponible.
         /// </summary>
         private void ActualizarInformacionProducto()
         {
@@ -372,11 +437,14 @@ namespace ProyectoP5
         /// </summary>
         private void AgregarProducto()
         {
+            if (registrandoVenta)
+                return;
+
             if (cboProductos.SelectedItem
                 is not VentaProductoOpcion producto)
             {
                 MessageBox.Show(
-                    "Seleccione un producto.");
+                    "Seleccione un producto válido.");
                 return;
             }
 
@@ -387,13 +455,19 @@ namespace ProyectoP5
 
             int agregado = existente?.Cantidad ?? 0;
 
-            if (cantidad > producto.Stock - agregado)
+            int disponible = Math.Max(
+                0, producto.Stock - agregado);
+
+            if (cantidad > disponible)
             {
                 MessageBox.Show(
-                    "No hay suficientes unidades disponibles.",
-                    "Stock insuficiente",
+                    $"No hay suficientes unidades de " +
+                    $"{producto.Nombre}.\n" +
+                    $"Disponibles: {disponible}",
+                    "Inventario insuficiente",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+
                 return;
             }
 
@@ -415,10 +489,13 @@ namespace ProyectoP5
             ActualizarTabla();
 
             nudCantidad.Value = 1;
+
+            lblEstado.Text =
+                "Producto agregado correctamente.";
         }
 
         /// <summary>
-        /// Muestra el carrito y calcula el total.
+        /// Actualiza el listado y el total de la venta.
         /// </summary>
         private void ActualizarTabla()
         {
@@ -435,7 +512,8 @@ namespace ProyectoP5
 
             if (dgvDetalles.Columns["ProductoId"] != null)
             {
-                dgvDetalles.Columns["ProductoId"]!.Visible = false;
+                dgvDetalles.Columns["ProductoId"]!
+                    .Visible = false;
             }
 
             if (dgvDetalles.Columns["Precio"] != null)
@@ -462,6 +540,9 @@ namespace ProyectoP5
         /// </summary>
         private void QuitarProducto()
         {
+            if (registrandoVenta)
+                return;
+
             if (dgvDetalles.CurrentRow == null)
                 return;
 
@@ -476,97 +557,147 @@ namespace ProyectoP5
             var detalle = carrito.FirstOrDefault(
                 p => p.ProductoId == productoId);
 
-            if (detalle == null)
-                return;
+            if (detalle != null)
+            {
+                carrito.Remove(detalle);
 
-            carrito.Remove(detalle);
+                ActualizarTabla();
 
-            ActualizarTabla();
+                lblEstado.Text =
+                    "Producto eliminado del carrito.";
+            }
         }
 
         /// <summary>
-        /// Limpia los artículos agregados.
+        /// Vacía el carrito sin modificar MySQL.
         /// </summary>
         private void LimpiarVenta()
         {
+            if (registrandoVenta)
+                return;
+
             carrito.Clear();
 
             ActualizarTabla();
+
+            lblEstado.Text = "Carrito vacío.";
         }
 
         /// <summary>
-        /// Guarda la venta mediante la capa Negocio.
+        /// Habilita o deshabilita los controles
+        /// durante el registro de la venta.
+        /// </summary>
+        private void CambiarEstadoControles(bool habilitar)
+        {
+            cboClientes.Enabled = habilitar;
+            cboProductos.Enabled = habilitar;
+            nudCantidad.Enabled = habilitar;
+
+            btnAgregar.Enabled = habilitar;
+            btnEliminar.Enabled = habilitar;
+            btnLimpiar.Enabled = habilitar;
+            btnActualizar.Enabled = habilitar;
+            btnRegistrar.Enabled = habilitar;
+        }
+
+        /// <summary>
+        /// Valida y registra la venta en MySQL.
         /// </summary>
         private void RegistrarVenta()
         {
+            // Evita iniciar otra operación mientras
+            // ya se está procesando una venta.
+            if (registrandoVenta)
+                return;
+
             if (cboClientes.SelectedItem
                 is not VentaClienteOpcion cliente)
             {
                 MessageBox.Show(
-                    "Debe seleccionar un cliente.");
+                    "Seleccione un cliente válido.");
                 return;
             }
 
             if (carrito.Count == 0)
             {
                 MessageBox.Show(
-                    "Agregue al menos un producto.");
+                    "Debe agregar al menos un producto.");
                 return;
             }
 
             decimal total = carrito.Sum(p => p.Subtotal);
 
-            DialogResult respuesta = MessageBox.Show(
-                $"¿Desea registrar la venta por ₡{total:N2}?\n" +
-                "El importe definitivo se calculará con " +
-                "los precios actuales de MySQL.",
+            DialogResult confirmacion = MessageBox.Show(
+                $"¿Desea registrar esta venta por ₡{total:N2}?",
                 "Confirmar venta",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
-            if (respuesta != DialogResult.Yes)
+            if (confirmacion != DialogResult.Yes)
                 return;
 
-            btnRegistrar.Enabled = false;
+            registrandoVenta = true;
+            CambiarEstadoControles(false);
+
+            lblEstado.Text = "Registrando venta...";
 
             try
             {
-                var venta = new VentaRegistro
-                {
-                    ClienteId = cliente.Id,
-                    Fecha = DateTime.Now,
-                    Detalles = carrito.Select(p => new DetalleVenta
+                // Crear una copia del carrito.
+                var detalles = carrito.Select(
+                    p => new DetalleVenta
                     {
                         ProductoId = p.ProductoId,
                         NombreProducto = p.NombreProducto,
                         Cantidad = p.Cantidad,
                         PrecioUnitario = p.PrecioUnitario
-                    }).ToList()
+                    }).ToList();
+
+                var venta = new VentaRegistro
+                {
+                    ClienteId = cliente.Id,
+                    Fecha = DateTime.Now,
+                    Detalles = detalles
                 };
 
+                // Enviar la operación a la capa Negocio.
                 int ventaId = servicio.RegistrarVenta(venta);
 
+                // La venta ya quedó confirmada en MySQL.
+                carrito.Clear();
+                ActualizarTabla();
+
+                lblEstado.Text =
+                    $"Venta #{ventaId} registrada correctamente.";
+
                 MessageBox.Show(
-                    $"La venta #{ventaId} se registró correctamente.",
-                    "Venta registrada",
+                    $"Venta #{ventaId} registrada correctamente.",
+                    "Venta guardada",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
 
-                LimpiarVenta();
+                // Actualizar el catálogo y las existencias.
                 CargarDatos();
             }
             catch (Exception ex)
             {
+                lblEstado.Text =
+                    "Ocurrió un problema al registrar la venta.";
+
                 MessageBox.Show(
-                    "No se pudo registrar la venta:\n" +
-                    ex.Message,
-                    "Error",
+                    "No se pudo completar la operación:\n" +
+                    ex.Message +
+                    "\n\nSi la conexión se interrumpió, " +
+                    "verifique el historial antes de intentarlo " +
+                    "nuevamente.",
+                    "Error al registrar venta",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
             finally
             {
-                btnRegistrar.Enabled = true;
+                registrandoVenta = false;
+                CambiarEstadoControles(true);
             }
         }
     }

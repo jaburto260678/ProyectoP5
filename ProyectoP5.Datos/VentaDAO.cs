@@ -8,20 +8,18 @@ using ProyectoP5.Entidades;
 namespace ProyectoP5.Datos
 {
     /// <summary>
-    /// Maneja las operaciones de ventas en la base
-    /// de datos MySQL.
+    /// Maneja las consultas y el registro de ventas en MySQL.
     /// </summary>
     public class VentaDAO
     {
         /// <summary>
-        /// Obtiene los clientes activos registrados.
+        /// Obtiene los clientes activos de la base de datos.
         /// </summary>
         public List<VentaClienteOpcion> ObtenerClientes()
         {
             var clientes = new List<VentaClienteOpcion>();
 
             using var conexion = VentaConexion.CrearConexion();
-
             conexion.Open();
 
             const string sql = @"
@@ -30,9 +28,7 @@ namespace ProyectoP5.Datos
                 WHERE activo = 1
                 ORDER BY nombre";
 
-            using var comando = new MySqlCommand(
-                sql, conexion);
-
+            using var comando = new MySqlCommand(sql, conexion);
             using var lector = comando.ExecuteReader();
 
             while (lector.Read())
@@ -48,15 +44,13 @@ namespace ProyectoP5.Datos
         }
 
         /// <summary>
-        /// Obtiene los productos activos que tienen
-        /// existencias disponibles.
+        /// Obtiene los productos activos con stock disponible.
         /// </summary>
         public List<VentaProductoOpcion> ObtenerProductos()
         {
             var productos = new List<VentaProductoOpcion>();
 
             using var conexion = VentaConexion.CrearConexion();
-
             conexion.Open();
 
             const string sql = @"
@@ -65,9 +59,7 @@ namespace ProyectoP5.Datos
                 WHERE activo = 1 AND stock > 0
                 ORDER BY nombre";
 
-            using var comando = new MySqlCommand(
-                sql, conexion);
-
+            using var comando = new MySqlCommand(sql, conexion);
             using var lector = comando.ExecuteReader();
 
             while (lector.Read())
@@ -86,62 +78,64 @@ namespace ProyectoP5.Datos
         }
 
         /// <summary>
-        /// Registra una venta, guarda sus detalles
-        /// y descuenta las existencias del inventario.
-        /// Devuelve el ID de la venta registrada.
+        /// Registra una venta y actualiza las existencias.
+        /// Devuelve el identificador de la venta registrada.
         /// </summary>
         public int RegistrarVenta(VentaRegistro venta)
         {
             if (venta == null)
             {
-                throw new ArgumentNullException(
-                    nameof(venta));
+                throw new ArgumentNullException(nameof(venta));
             }
 
             if (venta.ClienteId <= 0)
             {
                 throw new ArgumentException(
-                    "Debe seleccionar un cliente válido.");
+                    "Seleccione un cliente válido.");
             }
 
             if (venta.Detalles == null ||
                 venta.Detalles.Count == 0)
             {
                 throw new ArgumentException(
-                    "Debe agregar al menos un producto.");
+                    "Agregue al menos un producto.");
             }
 
-            // Validar todos los detalles antes de guardar.
-            foreach (var detalle in venta.Detalles)
+            // Validar los detalles antes de conectar con MySQL.
+            foreach (DetalleVenta detalle in venta.Detalles)
             {
                 if (detalle == null ||
                     detalle.ProductoId <= 0 ||
                     detalle.Cantidad <= 0)
                 {
                     throw new ArgumentException(
-                        "La venta contiene productos " +
-                        "o cantidades no válidas.");
+                        "Existen productos o cantidades incorrectas.");
+                }
+
+                if (detalle.PrecioUnitario < 0)
+                {
+                    throw new ArgumentException(
+                        "El precio del producto no puede ser negativo.");
                 }
             }
 
-            // Agrupar productos repetidos.
+            // Agrupar productos repetidos y sumar cantidades.
             var detallesAgrupados = venta.Detalles
                 .GroupBy(d => d.ProductoId)
-                .Select(g => new
+                .Select(grupo => new
                 {
-                    ProductoId = g.Key,
-                    Cantidad = g.Sum(d => (long)d.Cantidad)
+                    ProductoId = grupo.Key,
+                    Cantidad = grupo.Sum(d => (long)d.Cantidad),
+                    Precios = grupo.Select(
+                        d => d.PrecioUnitario).Distinct().ToList()
                 })
                 .OrderBy(d => d.ProductoId)
                 .ToList();
 
-            using var conexion =
-                VentaConexion.CrearConexion();
-
+            using var conexion = VentaConexion.CrearConexion();
             conexion.Open();
 
-            using var transaccion =
-                conexion.BeginTransaction();
+            using var transaccion = conexion.BeginTransaction();
 
             try
             {
@@ -149,13 +143,13 @@ namespace ProyectoP5.Datos
                 const string sqlCliente = @"
                     SELECT COUNT(*)
                     FROM clientes
-                    WHERE id = @id AND activo = 1";
+                    WHERE id = @clienteId AND activo = 1";
 
                 using (var comando = new MySqlCommand(
                     sqlCliente, conexion, transaccion))
                 {
                     comando.Parameters.AddWithValue(
-                        "@id", venta.ClienteId);
+                        "@clienteId", venta.ClienteId);
 
                     long cantidadClientes =
                         Convert.ToInt64(comando.ExecuteScalar());
@@ -167,11 +161,10 @@ namespace ProyectoP5.Datos
                     }
                 }
 
-                var productosVenta =
-                    new List<DetalleVenta>();
+                var productosVenta = new List<DetalleVenta>();
 
-                // Consultar el precio real y bloquear
-                // cada producto durante la transacción.
+                // Bloquear los productos mientras se registra
+                // la venta para evitar inconsistencias de stock.
                 foreach (var detalle in detallesAgrupados)
                 {
                     if (detalle.Cantidad > int.MaxValue)
@@ -180,21 +173,28 @@ namespace ProyectoP5.Datos
                             "La cantidad solicitada es demasiado grande.");
                     }
 
+                    if (detalle.Precios.Count != 1)
+                    {
+                        throw new InvalidOperationException(
+                            "Hay precios diferentes para el mismo producto. " +
+                            "Actualice los datos y vuelva a intentarlo.");
+                    }
+
                     const string sqlProducto = @"
                         SELECT nombre, precio, stock
                         FROM productos
-                        WHERE id = @id AND activo = 1
+                        WHERE id = @productoId AND activo = 1
                         FOR UPDATE";
 
                     using var comando = new MySqlCommand(
                         sqlProducto, conexion, transaccion);
 
                     comando.Parameters.AddWithValue(
-                        "@id", detalle.ProductoId);
+                        "@productoId", detalle.ProductoId);
 
                     string nombre;
-                    decimal precio;
-                    int stock;
+                    decimal precioActual;
+                    int stockActual;
 
                     using (var lector = comando.ExecuteReader())
                     {
@@ -202,19 +202,30 @@ namespace ProyectoP5.Datos
                         {
                             throw new InvalidOperationException(
                                 $"El producto {detalle.ProductoId} " +
-                                "no está disponible.");
+                                "no existe o está inactivo.");
                         }
 
                         nombre = lector.GetString(0);
-                        precio = lector.GetDecimal(1);
-                        stock = lector.GetInt32(2);
+                        precioActual = lector.GetDecimal(1);
+                        stockActual = lector.GetInt32(2);
                     }
 
-                    if (stock < detalle.Cantidad)
+                    // Detectar cambios de precio.
+                    if (precioActual != detalle.Precios[0])
                     {
                         throw new InvalidOperationException(
-                            $"No hay suficiente stock de {nombre}. " +
-                            $"Disponible: {stock}.");
+                            $"El precio de {nombre} cambió a " +
+                            $"₡{precioActual:N2}. " +
+                            "Actualice los productos y vuelva " +
+                            "a preparar la venta.");
+                    }
+
+                    // Comprobar las existencias.
+                    if (stockActual < detalle.Cantidad)
+                    {
+                        throw new InvalidOperationException(
+                            $"Stock insuficiente para {nombre}. " +
+                            $"Disponible: {stockActual}.");
                     }
 
                     productosVenta.Add(new DetalleVenta
@@ -222,20 +233,21 @@ namespace ProyectoP5.Datos
                         ProductoId = detalle.ProductoId,
                         NombreProducto = nombre,
                         Cantidad = (int)detalle.Cantidad,
-                        PrecioUnitario = precio
+                        PrecioUnitario = precioActual
                     });
                 }
 
-                // Calcular el importe con precios de MySQL.
-                decimal total = productosVenta
-                    .Sum(p => p.Subtotal);
+                // Calcular el total utilizando precios
+                // comprobados directamente en MySQL.
+                decimal total = productosVenta.Sum(
+                    producto => producto.Subtotal);
 
-                // Guardar la cabecera.
+                // Guardar la cabecera de la venta.
                 const string sqlVenta = @"
                     INSERT INTO ventas
-                    (fecha, cliente_id, total)
+                        (fecha, cliente_id, total)
                     VALUES
-                    (@fecha, @cliente, @total)";
+                        (@fecha, @clienteId, @total)";
 
                 int ventaId;
 
@@ -246,7 +258,7 @@ namespace ProyectoP5.Datos
                         "@fecha", DateTime.Now);
 
                     comando.Parameters.AddWithValue(
-                        "@cliente", venta.ClienteId);
+                        "@clienteId", venta.ClienteId);
 
                     comando.Parameters.AddWithValue(
                         "@total", total);
@@ -257,26 +269,25 @@ namespace ProyectoP5.Datos
                         (int)comando.LastInsertedId);
                 }
 
-                // Guardar los detalles de la venta
-                // y actualizar el inventario.
-                foreach (var producto in productosVenta)
+                // Guardar los productos vendidos.
+                foreach (DetalleVenta producto in productosVenta)
                 {
                     const string sqlDetalle = @"
                         INSERT INTO detalle_venta
-                        (venta_id, producto_id, cantidad,
-                         precio_unitario, subtotal)
+                            (venta_id, producto_id, cantidad,
+                             precio_unitario, subtotal)
                         VALUES
-                        (@venta, @producto, @cantidad,
-                         @precio, @subtotal)";
+                            (@ventaId, @productoId, @cantidad,
+                             @precio, @subtotal)";
 
                     using (var comando = new MySqlCommand(
                         sqlDetalle, conexion, transaccion))
                     {
                         comando.Parameters.AddWithValue(
-                            "@venta", ventaId);
+                            "@ventaId", ventaId);
 
                         comando.Parameters.AddWithValue(
-                            "@producto", producto.ProductoId);
+                            "@productoId", producto.ProductoId);
 
                         comando.Parameters.AddWithValue(
                             "@cantidad", producto.Cantidad);
@@ -290,20 +301,23 @@ namespace ProyectoP5.Datos
                         comando.ExecuteNonQuery();
                     }
 
-                    const string sqlStock = @"
+                    // Descontar el inventario únicamente
+                    // si existe stock suficiente.
+                    const string sqlActualizarStock = @"
                         UPDATE productos
                         SET stock = stock - @cantidad
-                        WHERE id = @producto
-                        AND stock >= @cantidad";
+                        WHERE id = @productoId
+                          AND activo = 1
+                          AND stock >= @cantidad";
 
                     using (var comando = new MySqlCommand(
-                        sqlStock, conexion, transaccion))
+                        sqlActualizarStock, conexion, transaccion))
                     {
                         comando.Parameters.AddWithValue(
                             "@cantidad", producto.Cantidad);
 
                         comando.Parameters.AddWithValue(
-                            "@producto", producto.ProductoId);
+                            "@productoId", producto.ProductoId);
 
                         int filasAfectadas =
                             comando.ExecuteNonQuery();
@@ -311,21 +325,21 @@ namespace ProyectoP5.Datos
                         if (filasAfectadas != 1)
                         {
                             throw new InvalidOperationException(
-                                "No se pudo actualizar el stock " +
-                                "del producto " +
-                                producto.NombreProducto);
+                                "No se pudo actualizar el inventario " +
+                                $"de {producto.NombreProducto}.");
                         }
                     }
                 }
 
-                // Confirmar todos los cambios.
+                // Confirmar la venta y sus detalles.
                 transaccion.Commit();
 
                 return ventaId;
             }
             catch
             {
-                // Cancelar los cambios si ocurre algún error.
+                // Deshacer todos los cambios
+                // si alguna operación falla.
                 transaccion.Rollback();
                 throw;
             }
