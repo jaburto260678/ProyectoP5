@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProyectoP5.Negocio")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+86b25a2b78211f9dfd640b7993cee559b7d3bcc5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9781d5046d5410f1f9ca5227a3a300ac8b78425")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProyectoP5.Negocio")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProyectoP5.Negocio")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

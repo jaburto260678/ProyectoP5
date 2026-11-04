@@ -251,8 +251,8 @@
             "framework": "net8.0-windows7.0",
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Entidades\\ProyectoP5.Entidades.csproj": {
-                "projectPath": "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Entidades\\ProyectoP5.Entidades.csproj"
+              "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Datos\\ProyectoP5.Datos.csproj": {
+                "projectPath": "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Datos\\ProyectoP5.Datos.csproj"
               },
               "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Negocio\\ProyectoP5.Negocio.csproj": {
                 "projectPath": "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Negocio\\ProyectoP5.Negocio.csproj"
@@ -277,6 +277,10 @@
           "framework": "net8.0-windows7.0",
           "targetAlias": "net8.0-windows",
           "dependencies": {
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[26.10.0, )"
+            },
             "MySqlConnector": {
               "target": "Package",
               "version": "[2.6.2, )"
