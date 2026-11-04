@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
-    "net8.0-windows7.0": {
+    "net8.0-windows": {
       "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2": {
         "type": "package",
         "compile": {
@@ -52,6 +52,44 @@
           "lib/net8.0/MySqlConnector.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "ProyectoP5.Datos/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MySqlConnector": "2.6.2",
+          "ProyectoP5.Entidades": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProyectoP5.Datos.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProyectoP5.Datos.dll": {}
+        }
+      },
+      "ProyectoP5.Entidades/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/ProyectoP5.Entidades.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProyectoP5.Entidades.dll": {}
+        }
+      },
+      "ProyectoP5.Negocio/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "ProyectoP5.Datos": "1.0.0",
+          "ProyectoP5.Entidades": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProyectoP5.Negocio.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProyectoP5.Negocio.dll": {}
         }
       }
     }
@@ -192,31 +230,48 @@
         "mysqlconnector.2.6.2.nupkg.sha512",
         "mysqlconnector.nuspec"
       ]
+    },
+    "ProyectoP5.Datos/1.0.0": {
+      "type": "project",
+      "path": "ProyectoP5.Datos/ProyectoP5.Datos.csproj",
+      "msbuildProject": "ProyectoP5.Datos/ProyectoP5.Datos.csproj"
+    },
+    "ProyectoP5.Entidades/1.0.0": {
+      "type": "project",
+      "path": "ProyectoP5.Entidades/ProyectoP5.Entidades.csproj",
+      "msbuildProject": "ProyectoP5.Entidades/ProyectoP5.Entidades.csproj"
+    },
+    "ProyectoP5.Negocio/1.0.0": {
+      "type": "project",
+      "path": "ProyectoP5.Negocio/ProyectoP5.Negocio.csproj",
+      "msbuildProject": "ProyectoP5.Negocio/ProyectoP5.Negocio.csproj"
     }
   },
   "projectFileDependencyGroups": {
-    "net8.0-windows7.0": [
-      "MySqlConnector >= 2.6.2"
+    "net8.0-windows": [
+      "MySqlConnector >= 2.6.2",
+      "ProyectoP5.Entidades >= 1.0.0",
+      "ProyectoP5.Negocio >= 1.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Usuario\\.nuget\\packages\\": {},
+    "C:\\Users\\ander\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\VSSolutions\\ProyectoP5\\ProyectoP5.Presentacion.csproj",
+      "projectUniqueName": "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Presentacion.csproj",
       "projectName": "ProyectoP5.Presentacion",
-      "projectPath": "C:\\VSSolutions\\ProyectoP5\\ProyectoP5.Presentacion.csproj",
-      "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-      "outputPath": "C:\\VSSolutions\\ProyectoP5\\obj\\",
+      "projectPath": "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Presentacion.csproj",
+      "packagesPath": "C:\\Users\\ander\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ander\\Documents\\ProyectoP5\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Usuario\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ander\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -225,13 +280,20 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net8.0-windows7.0": {
+        "net8.0-windows": {
+          "framework": "net8.0-windows7.0",
           "targetAlias": "net8.0-windows",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Entidades\\ProyectoP5.Entidades.csproj": {
+              "projectPath": "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Entidades\\ProyectoP5.Entidades.csproj"
+            },
+            "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Negocio\\ProyectoP5.Negocio.csproj": {
+              "projectPath": "C:\\Users\\ander\\Documents\\ProyectoP5\\ProyectoP5.Negocio\\ProyectoP5.Negocio.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -243,10 +305,12 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "10.0.400"
     },
     "frameworks": {
-      "net8.0-windows7.0": {
+      "net8.0-windows": {
+        "framework": "net8.0-windows7.0",
         "targetAlias": "net8.0-windows",
         "dependencies": {
           "MySqlConnector": {
@@ -273,7 +337,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.403/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
